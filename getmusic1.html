@@ -1,0 +1,124 @@
+<html>
+<style>
+    #textarea {
+        width: 400px;
+        height: 30px;
+        float: left;
+    }
+
+    .searchbox {
+        width: 100%;
+        position: absolute;
+        left: 5%;
+        top: 5%
+    }
+
+    #button {
+        width: 80px;
+        height: 30px;
+    }
+
+    #screen {
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 540px;
+        height: 540px;
+    }
+</style>
+
+<body>
+    <div class="searchbox">
+        <textarea id="textarea">请输入歌手或者歌名进行查找</textarea>
+        <button id="button">Search</button>
+    </div>
+    <div id="screen"></div>
+</body>
+
+
+<script>
+    let button = document.getElementById("button")
+    let textarea = document.getElementById("textarea")
+    button.addEventListener('click', get_imform, false)
+
+
+    let enter = document.onkeydown = keyDown;//回车
+    function keyDown(e) {
+        var e = e || event;
+        var key = e.keyCode || e.which || e.charCode;
+        if (key == 0xD) { //判断是否按下回车键
+            pro_submitForm(loginform);
+        }
+    }
+
+    button.addEventListener(enter, get_imform, false)
+
+    function get_imform() {
+        var element,
+            Elements = document.getElementsByTagName('table');
+        // ????P??
+        while (Elements.length > 0) {
+            element = Elements[0];
+            element.parentElement.removeChild(element);
+        }
+
+        var text = document.getElementById("textarea").value
+        const API = 'https://music.niubishanshan.top/api/v2/music/search/' + text
+
+        const request = new XMLHttpRequest()
+        request.open('GET', API, true)
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                if (request.status === 200) {
+                    const json = JSON.parse(request.responseText)
+                    for (var i = 0; i < json.data.songList.length; i++) {
+                        const songname = json.data.songList[i].songName
+                        const singer = json.data.songList[i].singer[0].singerName
+                        createtext(songname, singer)
+                    }
+                    console.log(json.data.songList)
+                    console.log('????')
+                } else {
+                    console.log('????')
+                }
+            }
+        }
+
+        request.send()
+    }
+
+    function createtext(song, singer) {
+        var screen = document.getElementById("screen")
+        var table = document.createElement('table')
+        var th1 = document.createElement('th')
+        var th2 = document.createElement('th')
+        var th3 = document.createElement('th')
+        var th4 = document.createElement('th')
+        var tr = document.createElement('tr')
+        var song = document.createTextNode(song)
+        var singer = document.createTextNode(singer)
+
+        table.style.backgroundColor = "pink"
+        table.style.width = "100%"
+        table.style.padding = "10px"
+        table.style.height = "30px"
+        table.style.verticalAlign = "middle"
+        th1.style.textAlign = "left"
+        th4.style.textAlign = "right"
+
+        table.appendChild(tr)
+        tr.appendChild(th1)
+        tr.appendChild(th2)
+        tr.appendChild(th3)
+        tr.appendChild(th4)
+        th1.appendChild(song)
+        th4.appendChild(singer)
+
+        screen.appendChild(table)
+    }
+
+</script>
+
+</html>
